@@ -16,23 +16,24 @@ export namespace Resource {
   }
 
   export function count() {
-    return _sourceMap.size;
+    return pendingSource.size + _sourceMap.size;
   }
 
   export function add(texture: Texture) {
-    pendingSource.add(
-      texture.load().then((d) => {
-        _sourceMap.set(texture.name, texture);
-        Event.next({
-          type: Events.LOADING,
-          value: {
-            total: count(),
-            schedule: ++_count,
-          },
-        });
-        return d;
-      })
-    );
+    const promise = texture.load().then((d) => {
+      pendingSource.delete(promise);
+      _sourceMap.set(texture.name, texture);
+
+      Event.next({
+        type: Events.LOADING,
+        value: {
+          total: count(),
+          schedule: ++_count,
+        },
+      });
+      return d;
+    });
+    pendingSource.add(promise);
 
     return Resource;
   }

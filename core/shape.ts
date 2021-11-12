@@ -22,6 +22,8 @@ export class Shape implements IChild {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    ctx.drawImage(this.texture.bitmap, this.x, this.y);
+    if (this.texture.loaded) {
+      ctx.drawImage(this.texture.bitmap, this.x, this.y);
+    }
   }
 }
