@@ -1,33 +1,12 @@
 import { filter, share, Subject } from "rxjs";
-import { Scene } from "./scene";
-
-export enum Events {
-  FRAME,
-  CLICK,
-  SWITCH_SCENE,
-  FIRST_FRAME,
-}
-
-type IFrame = {
-  type: Events.FRAME;
-  value: number;
-};
-
-type IClick = {
-  type: Events.CLICK;
-  value: MouseEvent;
-};
-
-type ISwitch = {
-  type: Events.SWITCH_SCENE;
-  value: Scene;
-};
-
-type IEvent = IFrame | IClick | ISwitch;
+import { Events, IClick, IEvent, IFrame, ISwitch } from "./base";
 
 export const Event = new (class extends Subject<IEvent> {
+  // 动画帧
   frame = this.on<IFrame>(Events.FRAME);
+  // 点击事件
   click = this.on<IClick>(Events.CLICK);
+  // 场景切换
   scene = this.on<ISwitch>(Events.SWITCH_SCENE);
   on<T extends IEvent>(event: T["type"]) {
     return this.pipe(

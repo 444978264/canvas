@@ -1,12 +1,21 @@
-import { IDestroy } from "./base";
-import { Event, Events } from "./event";
+import { Events, IDestroy, STAGE_STATUS } from "./base";
+import { Event } from "./event";
 import { Scene } from "./scene";
 
 export class Stage implements IDestroy {
   private _destroy: () => void;
-  private _currentScene: Scene;
-  private context: CanvasRenderingContext2D;
   private _sceneManager = new Map<string, Scene>();
+  public context: CanvasRenderingContext2D;
+  public currentScene: Scene | null;
+  public status: STAGE_STATUS = STAGE_STATUS.LOADING;
+
+  get width() {
+    return this._canvas.width;
+  }
+
+  get height() {
+    return this._canvas.height;
+  }
 
   constructor(private _canvas: HTMLCanvasElement) {
     const context = this._canvas.getContext("2d");
@@ -33,7 +42,6 @@ export class Stage implements IDestroy {
         type: Events.FRAME,
         value: s,
       });
-      this._currentScene?.draw();
       requestAnimationFrame(frameRender);
     };
 
@@ -49,6 +57,8 @@ export class Stage implements IDestroy {
   // 注册场景
   register(scene: Scene) {
     this._sceneManager.set(scene.name, scene);
+    // 绑定舞台
+    scene.setStage(this);
     return this;
   }
 
@@ -56,7 +66,12 @@ export class Stage implements IDestroy {
   switchScene(name: string) {
     const scene = this._sceneManager.get(name);
     if (scene) {
-      this._currentScene = scene;
+      // 上一个场景 注销
+      this.currentScene?.destroy();
+      this.currentScene = scene;
+      // 新场景场景 挂载
+      this.currentScene.mounted();
+
       Event.next({
         type: Events.SWITCH_SCENE,
         value: scene,
@@ -69,5 +84,6 @@ export class Stage implements IDestroy {
 
   destroy() {
     this._destroy();
+    this.currentScene = null;
   }
 }
