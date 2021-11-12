@@ -1,4 +1,5 @@
 import { Scene } from "./scene";
+import { Texture } from "./Texture";
 
 export interface IDestroy {
   destroy(): void;
@@ -43,7 +44,20 @@ export type ILoading = {
 export type IEvent = IFrame | IClick | ISwitch | ILoading;
 
 export enum STAGE_STATUS {
-  LOADING,
-  PAUSED,
-  PLAY,
+  LOADING, // 加载资源
+  PAUSED, // 暂停
+  PLAY, // 播放
+  TRANSITION, // 转场
+}
+
+export interface IParent {
+  appendChild(child: IChild): any;
+  removeChild(child: IChild): any;
+}
+
+export type IParents = IParent | IParent[];
+
+export interface IChild {
+  draw(ctx: CanvasRenderingContext2D): void;
+  texture?: Texture;
 }

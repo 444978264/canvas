@@ -1,10 +1,11 @@
 import { filter } from "rxjs";
-import { ILifeCycle } from "./base";
+import { IChild, ILifeCycle, IParent } from "./base";
 import { Event } from "./event";
 import { Stage } from "./stage";
 
-export abstract class Scene implements ILifeCycle {
+export abstract class Scene implements ILifeCycle, IParent {
   private _stage: Stage | null;
+  private _children: Set<IChild>;
 
   get fps() {
     return ((1 / this._fps) * 1000).toFixed(2);
@@ -12,6 +13,13 @@ export abstract class Scene implements ILifeCycle {
 
   get stage() {
     return this._stage as Stage;
+  }
+
+  get children() {
+    if (!this._children) {
+      this._children = new Set();
+    }
+    return this._children;
   }
 
   constructor(public readonly name: string, private _fps: number = 60) {}
@@ -25,7 +33,12 @@ export abstract class Scene implements ILifeCycle {
       )
       .subscribe({
         next: ({ value }) => {
+          this.stage.context.save();
           next(this.stage.context);
+          this.children.forEach((child) => {
+            child.draw(this.stage.context);
+          });
+          this.stage.context.restore();
         },
         error,
       });
@@ -37,6 +50,16 @@ export abstract class Scene implements ILifeCycle {
 
   setStage(ctx: Stage) {
     this._stage = ctx;
+  }
+
+  appendChild(child: IChild) {
+    this.children.add(child);
+    return this;
+  }
+
+  removeChild(child: IChild) {
+    this.children.delete(child);
+    return this;
   }
 
   abstract draw(d: CanvasRenderingContext2D): void;

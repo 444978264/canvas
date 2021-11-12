@@ -1,6 +1,5 @@
 import { Subscription } from "rxjs";
 import { Event } from "../core/event";
-import { Resource } from "../core/resource";
 import { Scene } from "../core/scene";
 
 export const loading = new (class extends Scene {
@@ -19,7 +18,6 @@ export const loading = new (class extends Scene {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    ctx.save();
     ctx.font = `18px Arial`;
     ctx.strokeStyle = "red";
     ctx.textBaseline = "middle";
@@ -31,7 +29,6 @@ export const loading = new (class extends Scene {
       (this.stage.width - w) / 2,
       (this.stage.height - 18) / 2
     );
-    ctx.restore();
   }
 
   mounted() {

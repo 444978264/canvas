@@ -46,7 +46,7 @@ export class Stage implements IDestroy {
       if (!this._prevTime) {
         this._prevTime = s;
       }
-      // todo 控制帧有问题
+
       const elapsedTime = (s - this._prevTime).toFixed(2);
 
       if (elapsedTime >= this.fps) {
@@ -59,8 +59,6 @@ export class Stage implements IDestroy {
             value: s,
           });
         }
-      } else {
-        console.log("跳帧", elapsedTime, this.fps);
       }
 
       requestAnimationFrame(frameRender);
@@ -86,20 +84,24 @@ export class Stage implements IDestroy {
   // 切换视图
   switchScene(name: string) {
     const scene = this._sceneManager.get(name);
-    if (scene) {
-      // 上一个场景 注销
-      this.currentScene?.destroy();
-      this.currentScene = scene;
-      // 新场景场景 挂载
-      this.currentScene.mounted();
 
-      Event.next({
-        type: Events.SWITCH_SCENE,
-        value: scene,
-      });
-    } else {
-      console.error(`no scene called ${name}`);
-    }
+    Promise.resolve(scene).then((scene) => {
+      if (scene) {
+        // 上一个场景 注销
+        this.currentScene?.destroy();
+        this.currentScene = scene;
+        // 新场景场景 挂载
+        this.currentScene.mounted();
+
+        Event.next({
+          type: Events.SWITCH_SCENE,
+          value: scene,
+        });
+      } else {
+        console.error(`no scene called ${name}`);
+      }
+    });
+
     return this;
   }
 
