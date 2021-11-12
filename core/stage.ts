@@ -38,10 +38,13 @@ export class Stage implements IDestroy {
     };
 
     const frameRender = (s: number) => {
-      Event.next({
-        type: Events.FRAME,
-        value: s,
-      });
+      // 暂停 不跑动画帧
+      if (this.status !== STAGE_STATUS.PAUSED) {
+        Event.next({
+          type: Events.FRAME,
+          value: s,
+        });
+      }
       requestAnimationFrame(frameRender);
     };
 
