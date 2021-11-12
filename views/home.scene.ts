@@ -13,7 +13,6 @@ export const home = new (class extends Scene {
     ctx.drawImage(Resource.get("day")!, 0, 0);
     const land = Resource.get("land")!;
     ctx.drawImage(land, 0, this.stage.height - land.height);
-    console.log(Resource.count(), "count");
     ctx.restore();
   }
 
