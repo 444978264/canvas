@@ -42,9 +42,11 @@ export abstract class Scene implements ILifeCycle, IParent {
         },
         error,
       });
+
     return () => {
       sub.unsubscribe();
       this._stage = null;
+      this._children?.clear();
     };
   }
 
@@ -62,7 +64,7 @@ export abstract class Scene implements ILifeCycle, IParent {
     return this;
   }
 
-  abstract draw(d: CanvasRenderingContext2D): void;
+  // abstract draw(d: CanvasRenderingContext2D): void;
 
   abstract mounted(): void;
 

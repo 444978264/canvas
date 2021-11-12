@@ -1,12 +1,13 @@
 import { Events } from "./base";
 import { Event } from "./event";
+import { Texture } from "./Texture";
 
 type IMime = "image" | "audio" | "video";
 
 export namespace Resource {
   let _count = 0;
-  const _sourceMap = new Map<string, HTMLImageElement>();
-  const pendingSource = new Set<Promise<HTMLImageElement>>();
+  const _sourceMap = new Map<string, Texture>();
+  const pendingSource = new Set<Promise<boolean>>();
 
   export function get(name: string) {
     if (_sourceMap.has(name)) {
@@ -18,12 +19,20 @@ export namespace Resource {
     return _sourceMap.size;
   }
 
-  export function add(name, path, mime: IMime = "image") {
-    switch (mime) {
-      case "image":
-        loadImg(name, path);
-        break;
-    }
+  export function add(texture: Texture) {
+    pendingSource.add(
+      texture.load().then((d) => {
+        _sourceMap.set(texture.name, texture);
+        Event.next({
+          type: Events.LOADING,
+          value: {
+            total: count(),
+            schedule: ++_count,
+          },
+        });
+        return d;
+      })
+    );
 
     return Resource;
   }
@@ -39,34 +48,5 @@ export namespace Resource {
     Promise.all([...pendingSource]).then(() => {
       cbk && cbk();
     });
-  }
-
-  function loadImg(name: string, src: string) {
-    const img = new Image();
-    console.log(src, "src");
-    img.src = src;
-    const promise = new Promise<HTMLImageElement>((resolve, reject) => {
-      img.onload = _loaded(name, resolve);
-      img.onerror = reject;
-    });
-    pendingSource.add(promise);
-  }
-
-  function _loaded(name: string, resolve: (d: any) => void) {
-    return function () {
-      this.onload = null;
-
-      _sourceMap.set(name, this);
-
-      Event.next({
-        type: Events.LOADING,
-        value: {
-          total: count(),
-          schedule: ++_count,
-        },
-      });
-
-      resolve(this);
-    };
   }
 }

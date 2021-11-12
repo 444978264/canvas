@@ -9,11 +9,9 @@ export class Texture {
     return this.bitmap.height;
   }
 
-  constructor(public name: string, src?: string) {
-    if (src) {
-      this.bitmap = new Image();
-      this.bitmap.src = src;
-    }
+  constructor(public name: string, src: string) {
+    this.bitmap = new Image();
+    this.bitmap.src = src;
   }
 
   load = () => {

@@ -4,20 +4,31 @@ import { Shape } from "../core/shape";
 
 export const home = new (class extends Scene {
   private _destroy?: () => void;
+  _background: Shape;
+  _land: Shape;
 
   constructor() {
     super("home", 30);
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
-    ctx.drawImage(Resource.get("day")!, 0, 0);
-    const land = Resource.get("land")!;
-    ctx.drawImage(land, 0, this.stage.height - land.height);
-  }
-
   mounted() {
+    this._background = new Shape(Resource.get("day")!);
+    this.appendChild(this._background);
+    this._land = new Shape(Resource.get("land")!);
+    this.appendChild(this._land);
+    const landCopy = new Shape(Resource.get("land")!);
+    this.appendChild(landCopy);
+    landCopy.x = -this.stage.width;
+    landCopy.y = this._land.y = this.stage.height - this._land.texture.height;
+
     this._destroy = this.onFrame((ctx) => {
-      this.draw(ctx);
+      this._land.x += 2;
+      landCopy.x += 2;
+
+      if (this._land.x > this.stage.width) {
+        this._land.x = 0;
+        landCopy.x = -this.stage.width;
+      }
     });
   }
 
