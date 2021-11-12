@@ -1,6 +1,10 @@
+import { Events } from "./base";
+import { Event } from "./event";
+
 type IMime = "image" | "audio" | "video";
 
 export namespace Resource {
+  let _count = 0;
   const _sourceMap = new Map<string, HTMLImageElement>();
   const pendingSource = new Set<Promise<HTMLImageElement>>();
 
@@ -25,6 +29,13 @@ export namespace Resource {
   }
 
   export function ready(cbk?: () => void) {
+    Event.next({
+      type: Events.LOADING,
+      value: {
+        total: count(),
+        schedule: _count,
+      },
+    });
     Promise.all([...pendingSource]).then(() => {
       cbk && cbk();
     });
@@ -44,7 +55,17 @@ export namespace Resource {
   function _loaded(name: string, resolve: (d: any) => void) {
     return function () {
       this.onload = null;
+
       _sourceMap.set(name, this);
+
+      Event.next({
+        type: Events.LOADING,
+        value: {
+          total: count(),
+          schedule: ++_count,
+        },
+      });
+
       resolve(this);
     };
   }

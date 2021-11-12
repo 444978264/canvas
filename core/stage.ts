@@ -40,6 +40,7 @@ export class Stage implements IDestroy {
     const frameRender = (s: number) => {
       // 暂停 不跑动画帧
       if (this.status !== STAGE_STATUS.PAUSED) {
+        this.context.clearRect(0, 0, this.width, this.height);
         Event.next({
           type: Events.FRAME,
           value: s,

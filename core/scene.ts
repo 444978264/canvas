@@ -16,7 +16,7 @@ export abstract class Scene implements ILifeCycle {
     const sub = Event.frame
       .pipe(
         filter(() => {
-          return this._stage?.currentScene.name === this.name;
+          return this._stage?.currentScene?.name === this.name;
         })
       )
       .subscribe({
@@ -26,8 +26,8 @@ export abstract class Scene implements ILifeCycle {
         error,
       });
     return () => {
+      sub.unsubscribe();
       this._stage = null;
-      return sub.unsubscribe();
     };
   }
 

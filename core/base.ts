@@ -14,6 +14,7 @@ export enum Events {
   CLICK,
   SWITCH_SCENE,
   FIRST_FRAME,
+  LOADING,
 }
 
 export type IFrame = {
@@ -31,7 +32,15 @@ export type ISwitch = {
   value: Scene;
 };
 
-export type IEvent = IFrame | IClick | ISwitch;
+export type ILoading = {
+  type: Events.LOADING;
+  value: {
+    total: number;
+    schedule: number;
+  };
+};
+
+export type IEvent = IFrame | IClick | ISwitch | ILoading;
 
 export enum STAGE_STATUS {
   LOADING,
