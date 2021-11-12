@@ -5,7 +5,6 @@ import { Stage } from "./stage";
 
 export abstract class Scene implements ILifeCycle {
   private _stage: Stage | null;
-  private _prevTime: number;
 
   get fps() {
     return ((1 / this._fps) * 1000).toFixed(2);
@@ -26,14 +25,7 @@ export abstract class Scene implements ILifeCycle {
       )
       .subscribe({
         next: ({ value }) => {
-          if (!this._prevTime) {
-            this._prevTime = value;
-          }
-          const elapsedTime = (value - this._prevTime).toFixed(2);
-          if (elapsedTime >= this.fps) {
-            this._prevTime = value;
-            next(this.stage.context);
-          }
+          next(this.stage.context);
         },
         error,
       });

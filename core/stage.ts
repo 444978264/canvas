@@ -5,6 +5,7 @@ import { Scene } from "./scene";
 export class Stage implements IDestroy {
   private _destroy: () => void;
   private _sceneManager = new Map<string, Scene>();
+  private _prevTime: number;
   public context: CanvasRenderingContext2D;
   public currentScene: Scene | null;
   public status: STAGE_STATUS = STAGE_STATUS.LOADING;
@@ -15,6 +16,10 @@ export class Stage implements IDestroy {
 
   get height() {
     return this._canvas.height;
+  }
+
+  get fps() {
+    return this.currentScene?.fps ?? ((1 / 60) * 1000).toFixed(2);
   }
 
   constructor(private _canvas: HTMLCanvasElement) {
@@ -38,14 +43,26 @@ export class Stage implements IDestroy {
     };
 
     const frameRender = (s: number) => {
-      // 暂停 不跑动画帧
-      if (this.status !== STAGE_STATUS.PAUSED) {
-        this.context.clearRect(0, 0, this.width, this.height);
-        Event.next({
-          type: Events.FRAME,
-          value: s,
-        });
+      if (!this._prevTime) {
+        this._prevTime = s;
       }
+      // todo 控制帧有问题
+      const elapsedTime = (s - this._prevTime).toFixed(2);
+
+      if (elapsedTime >= this.fps) {
+        this._prevTime = s;
+        // 暂停 不跑动画帧
+        if (this.status !== STAGE_STATUS.PAUSED) {
+          this.context.clearRect(0, 0, this.width, this.height);
+          Event.next({
+            type: Events.FRAME,
+            value: s,
+          });
+        }
+      } else {
+        console.log("跳帧", elapsedTime, this.fps);
+      }
+
       requestAnimationFrame(frameRender);
     };
 

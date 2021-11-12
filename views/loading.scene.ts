@@ -10,7 +10,7 @@ export const loading = new (class extends Scene {
   private _schedule: number = 0;
 
   constructor() {
-    super("loading", 2);
+    super("loading");
     this._sub = Event.loading.subscribe(({ type, value }) => {
       const { total, schedule } = value;
       this._total = total;

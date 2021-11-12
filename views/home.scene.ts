@@ -5,7 +5,7 @@ export const home = new (class extends Scene {
   private _destroy?: () => void;
 
   constructor() {
-    super("home");
+    super("home", 30);
   }
 
   draw(ctx: CanvasRenderingContext2D) {
