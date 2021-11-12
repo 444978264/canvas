@@ -1,4 +1,5 @@
-import { Resource } from "./base/resource";
+import { Resource } from "./core/resource";
+import { Stage } from "./core/stage";
 
 document.documentElement.style.backgroundColor = "#000";
 const instance = (document.getElementById("canvas") as HTMLCanvasElement)!;
@@ -26,7 +27,4 @@ Resource.add("day", require("./assets/bg_day.png"))
     console.log(Resource.count(), "count");
   });
 
-class Shape {
-  x: number = 0;
-  y: number = 0;
-}
+const stage = new Stage(instance);
