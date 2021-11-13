@@ -64,8 +64,6 @@ export abstract class Scene implements ILifeCycle, IParent {
     return this;
   }
 
-  // abstract draw(d: CanvasRenderingContext2D): void;
-
   abstract mounted(): void;
 
   abstract destroy(): void;

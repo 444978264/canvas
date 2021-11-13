@@ -1,4 +1,4 @@
-export default {
+export const assets = {
   day: require("../assets/bg_day.png"),
   night: require("../assets/bg_night.png"),
   land: require("../assets/land.png"),
@@ -8,6 +8,7 @@ export default {
   blink0: require("../assets/blink_00.png"),
   blink1: require("../assets/blink_01.png"),
   blink2: require("../assets/blink_02.png"),
+  test: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic1.win4000.com%2Fwallpaper%2F2018-11-19%2F5bf2563439059.jpg&refer=http%3A%2F%2Fpic1.win4000.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1639386706&t=23f29d77554d6faafe845458fe1f7362",
   copyright: require("../assets/brand_copyright.png"),
   button_play: require("../assets/button_play.png"),
   title: require("../assets/title.png"),
@@ -25,3 +26,5 @@ export default {
   8: require("../assets/font_056.png"),
   9: require("../assets/font_057.png"),
 };
+
+export type IAssets = typeof assets;

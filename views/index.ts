@@ -1,4 +1,4 @@
-import assets from "../assets";
+import { assets } from "../assets";
 import { Stage } from "../lib/stage";
 import { home } from "./home.scene";
 import { loading } from "./loading.scene";

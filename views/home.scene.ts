@@ -11,6 +11,7 @@ export const home = new (class extends Scene {
   mounted() {
     const dayTexture = this.stage.resource.getTexture("day");
     const landTexture = this.stage.resource.getTexture("land");
+    const playBtn = this.stage.resource.getTexture("button_play");
 
     const background = new Shape(dayTexture);
     this.appendChild(background);
@@ -18,8 +19,16 @@ export const home = new (class extends Scene {
     this.appendChild(land);
     const landCopy = new Shape(landTexture);
     this.appendChild(landCopy);
+    const btn = new Shape(playBtn, { clickable: true });
+    btn.onClick((e) => {
+      console.log(e, "e");
+    });
+    this.appendChild(btn);
+
     landCopy.x = -this.stage.width;
     landCopy.y = land.y = this.stage.height - land.texture.height;
+    btn.x = (this.stage.width - btn.texture.width) / 2;
+    btn.y = (this.stage.height - btn.texture.height) / 2;
 
     console.log(this, "scene");
 

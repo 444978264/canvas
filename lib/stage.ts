@@ -1,16 +1,17 @@
+import { IAssets } from "../assets";
 import { Events, IDestroy, STAGE_STATUS } from "./base";
 import { Event } from "./event";
 import { Resource } from "./resource";
 import { Scene } from "./scene";
 
-export class Stage<T extends Record<string, string>> implements IDestroy {
+export class Stage implements IDestroy {
   private _destroy: () => void;
   private _sceneManager = new Map<string, Scene>();
   private _prevTime: number;
   public context: CanvasRenderingContext2D;
   public currentScene: Scene | null;
   public status: STAGE_STATUS = STAGE_STATUS.LOADING;
-  public resource: Resource<T>;
+  public resource: Resource<IAssets>;
 
   get width() {
     return this._canvas.width;
@@ -24,7 +25,7 @@ export class Stage<T extends Record<string, string>> implements IDestroy {
     return this.currentScene?.fps ?? ((1 / 60) * 1000).toFixed(2);
   }
 
-  constructor(private _canvas: HTMLCanvasElement, assets: T) {
+  constructor(private _canvas: HTMLCanvasElement, assets: IAssets) {
     this.context = this._canvas.getContext("2d")!;
     this._destroy = this.init();
     this.resource = new Resource(assets);

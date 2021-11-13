@@ -59,5 +59,6 @@ export type IParents = IParent | IParent[];
 
 export interface IChild {
   draw(ctx: CanvasRenderingContext2D): void;
+  destroy(): void;
   texture?: Texture;
 }
