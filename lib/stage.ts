@@ -1,14 +1,16 @@
 import { Events, IDestroy, STAGE_STATUS } from "./base";
 import { Event } from "./event";
+import { Resource } from "./resource";
 import { Scene } from "./scene";
 
-export class Stage implements IDestroy {
+export class Stage<T extends Record<string, string>> implements IDestroy {
   private _destroy: () => void;
   private _sceneManager = new Map<string, Scene>();
   private _prevTime: number;
   public context: CanvasRenderingContext2D;
   public currentScene: Scene | null;
   public status: STAGE_STATUS = STAGE_STATUS.LOADING;
+  public resource: Resource<T>;
 
   get width() {
     return this._canvas.width;
@@ -22,15 +24,16 @@ export class Stage implements IDestroy {
     return this.currentScene?.fps ?? ((1 / 60) * 1000).toFixed(2);
   }
 
-  constructor(private _canvas: HTMLCanvasElement) {
-    const context = this._canvas.getContext("2d");
-
-    if (context) {
-      this._destroy = this.init();
-      this.context = context;
-    } else {
-      console.error("Cannot support canvas");
-    }
+  constructor(private _canvas: HTMLCanvasElement, assets: T) {
+    this.context = this._canvas.getContext("2d")!;
+    this._destroy = this.init();
+    this.resource = new Resource(assets);
+    this.resource.subscribe((res) => {
+      Event.next({
+        type: Events.LOADING,
+        value: res,
+      });
+    });
   }
 
   // 画布初始化
@@ -71,6 +74,11 @@ export class Stage implements IDestroy {
       this._canvas.removeEventListener("click", clickHandle);
       cancelAnimationFrame(id);
     };
+  }
+
+  setLoading(scene: Scene) {
+    this.register(scene);
+    this.switchScene(scene.name);
   }
 
   // 注册场景

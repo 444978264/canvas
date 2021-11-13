@@ -1,4 +1,4 @@
-import { filter, share, shareReplay, Subject } from "rxjs";
+import { filter, share, shareReplay, Subject, Subscription } from "rxjs";
 import { Events, IClick, IEvent, IFrame, ILoading, ISwitch } from "./base";
 
 export const Event = new (class extends Subject<IEvent> {

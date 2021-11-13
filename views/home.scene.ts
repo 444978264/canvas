@@ -1,6 +1,5 @@
-import { Resource } from "../core/resource";
-import { Scene } from "../core/scene";
-import { Shape } from "../core/shape";
+import { Scene } from "../lib/scene";
+import { Shape } from "../lib/shape";
 
 export const home = new (class extends Scene {
   private _destroy?: () => void;
@@ -10,8 +9,9 @@ export const home = new (class extends Scene {
   }
 
   mounted() {
-    const dayTexture = Resource.get("day")!;
-    const landTexture = Resource.get("land")!;
+    const dayTexture = this.stage.resource.getTexture("day");
+    const landTexture = this.stage.resource.getTexture("land");
+
     const background = new Shape(dayTexture);
     this.appendChild(background);
     const land = new Shape(landTexture);

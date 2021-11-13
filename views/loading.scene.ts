@@ -1,6 +1,6 @@
 import { Subscription } from "rxjs";
-import { Event } from "../core/event";
-import { Scene } from "../core/scene";
+import { Event } from "../lib/event";
+import { Scene } from "../lib/scene";
 
 export const loading = new (class extends Scene {
   private _destroy?: () => void;
