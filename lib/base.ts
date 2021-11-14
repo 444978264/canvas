@@ -62,3 +62,14 @@ export interface IChild {
   destroy(): void;
   texture?: Texture;
 }
+
+interface IChildren {
+  draw(ctx: CanvasRenderingContext2D): void;
+  destroy(): void;
+}
+
+export abstract class Base {
+  private children = new Set<IChildren>();
+  appendChild(child: IChildren) {}
+  removeChild(child: IChildren) {}
+}
