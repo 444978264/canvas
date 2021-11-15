@@ -2,8 +2,6 @@ import { filter, share, shareReplay, Subject } from "rxjs";
 import {
   ClickEvent,
   Events,
-  IBubbling,
-  ICapture,
   IClick,
   IEvent,
   IFrame,
@@ -24,10 +22,6 @@ export const Event = new (class extends Subject<IEvent> {
   scene = this.on<ISwitch>(Events.SWITCH_SCENE);
   // 资源加载
   loading = this.on<ILoading>(Events.LOADING, true);
-  // 捕获
-  capture = this.on<ICapture>(Events.Capture);
-  // 冒泡
-  bubbling = this.on<IBubbling>(Events.Bubbling);
 
   on<T extends IEvent>(event: T["type"], replay = false) {
     return this.pipe(

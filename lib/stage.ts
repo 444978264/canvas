@@ -1,6 +1,6 @@
 import { IAssets } from "../assets";
-import { Base } from "./base";
-import { Events, IDestroy, STAGE_STATUS } from "./common";
+import { Base, IElement } from "./base";
+import { ClickEvent, Events, IDestroy, STAGE_STATUS } from "./common";
 import { Event, mouseEvent } from "./event";
 import { Resource } from "./resource";
 import { Scene } from "./scene";
@@ -8,7 +8,6 @@ import { Scene } from "./scene";
 export class Stage implements IDestroy {
   private _destroy: () => void;
   private _sceneManager = new Map<string, Scene>();
-  private _prevTime: number;
   public context: CanvasRenderingContext2D;
   public currentScene: Scene | null;
   public status: STAGE_STATUS = STAGE_STATUS.LOADING;
@@ -22,10 +21,6 @@ export class Stage implements IDestroy {
     return this._canvas.height;
   }
 
-  get fps() {
-    return this.currentScene?.fps ?? ((1 / 60) * 1000).toFixed(2);
-  }
-
   constructor(private _canvas: HTMLCanvasElement, assets: IAssets) {
     this.context = this._canvas.getContext("2d")!;
     this._destroy = this.init();
@@ -37,6 +32,42 @@ export class Stage implements IDestroy {
       });
     });
   }
+  
+  // 捕获
+  capture(e: ClickEvent, children: IElement[]): Base {
+    const result: { element: IElement; zIndex: number }[] = [];
+    let max: { element: IElement; zIndex: number } | null = null;
+    let data = children;
+
+    while (data.length) {
+      const element = data.shift()!;
+      if (Base.isClicked(e, element)) {
+        const idx = result.length - 1;
+        let last: any;
+        if (idx >= 0 && result[idx].element === element.parent) {
+          last = result[idx];
+          last.element = element;
+          last.zIndex++;
+        } else {
+          last = {
+            element,
+            zIndex: 0,
+          };
+          result.push(last);
+        }
+
+        if ((max && max.zIndex <= last.zIndex) || !max) {
+          max = last;
+        }
+
+        if (element.children.size) {
+          data = [...element.children];
+        }
+      }
+    }
+
+    return max!.element;
+  }
 
   // 画布初始化
   init() {
@@ -45,33 +76,22 @@ export class Stage implements IDestroy {
       mouseEvent.x = offsetX;
       mouseEvent.y = offsetY;
 
-      Event.next({
-        type: Events.Capture,
-        value: mouseEvent,
-      });
-      // Event.next({
-      //   type: Events.CLICK,
-      //   value: mouseEvent,
-      // });
+      if (this.currentScene && this.currentScene.children.size) {
+        const element = this.capture(mouseEvent, [
+          ...this.currentScene.children,
+        ]);
+        mouseEvent.target = element;
+        element.trigger("click", mouseEvent);
+      }
     };
 
     const frameRender = (s: number) => {
-      if (!this._prevTime) {
-        this._prevTime = s;
-      }
-
-      const elapsedTime = (s - this._prevTime).toFixed(2);
-
-      if (elapsedTime >= this.fps) {
-        this._prevTime = s;
-        // 暂停 不跑动画帧
-        if (this.status !== STAGE_STATUS.PAUSED) {
-          this.context.clearRect(0, 0, this.width, this.height);
-          Event.next({
-            type: Events.FRAME,
-            value: s,
-          });
-        }
+      if (this.status !== STAGE_STATUS.PAUSED) {
+        this.context.clearRect(0, 0, this.width, this.height);
+        Event.next({
+          type: Events.FRAME,
+          value: s,
+        });
       }
 
       requestAnimationFrame(frameRender);

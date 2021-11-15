@@ -5,7 +5,7 @@ export const home = new (class extends Scene {
   private _destroy?: () => void;
 
   constructor() {
-    super("home", 30);
+    super("home");
   }
 
   mounted() {
@@ -20,36 +20,25 @@ export const home = new (class extends Scene {
     const landCopy = new Shape(landTexture);
     this.appendChild(landCopy);
     const btn = new Shape(playBtn, { clickable: true });
-    const btn2 = new Shape(playBtn, { clickable: true });
-    
-    btn2.onClick((e) => {
-      e.stopPropagation();
-      console.log("btn2");
-    });
 
     btn.onClick((e) => {
-      console.log("btn1");
+      console.log("btn1", e);
     });
 
     this.appendChild(btn);
-    this.appendChild(btn2);
 
-    landCopy.x = -this.stage.width;
-    landCopy.y = land.y = this.stage.height - land.texture.height;
-    btn.x = (this.stage.width - btn.texture.width) / 2;
-    btn.y = (this.stage.height - btn.texture.height) / 2;
-    btn2.x = this.stage.width / 2;
-    btn2.y = this.stage.height / 2;
-
-    console.log(this, "scene");
+    landCopy.x = -this.clientWidth;
+    landCopy.y = land.y = this.clientHeight - land.texture.height;
+    btn.x = (this.clientWidth - btn.texture.width) / 2;
+    btn.y = (this.clientHeight - btn.texture.height) / 2;
 
     this._destroy = this.onFrame((ctx) => {
       land.x += 2;
       landCopy.x += 2;
 
-      if (land.x > this.stage.width) {
+      if (land.x > this.clientWidth) {
         land.x = 0;
-        landCopy.x = -this.stage.width;
+        landCopy.x = -this.clientWidth;
       }
     });
   }

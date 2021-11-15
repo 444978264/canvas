@@ -1,14 +1,13 @@
-import { filter, map } from "rxjs";
+import { map } from "rxjs";
 import { ClickEvent } from "./common";
 import { Event } from "./event";
 
-export interface IElement {
+export interface IElement extends Base {
   x: number;
   y: number;
   width: number;
   height: number;
   draw(ctx: CanvasRenderingContext2D): void;
-  parent?: Base;
   beforeFrameUpdate?(): void;
   mounted?(): void;
   destroy?(): void;
@@ -27,6 +26,9 @@ export interface IRectOptions {
   offsetY: number;
 }
 
+export type IEventType = "click";
+type IListener = (e: ClickEvent) => void;
+
 export class Base {
   static $$canvas: HTMLCanvasElement;
   static $$context: CanvasRenderingContext2D;
@@ -44,11 +46,12 @@ export class Base {
     }
     return Base.$$context;
   }
-
+  parent?: Base;
   protected _mounted = false;
   private _children?: Set<IElement>;
   private _prevTime: number;
   private _fps: string;
+  protected events = new Map<IEventType, IListener[]>();
 
   get children() {
     if (!this._children) {
@@ -77,7 +80,7 @@ export class Base {
 
   static getBoundingClientRect(
     element: IElement,
-    parents?: Base & IElement
+    parents?: IElement
   ): IRectOptions {
     const common = {
       x: element.x,
@@ -128,6 +131,54 @@ export class Base {
     return this._children ? this._children.has(child) : false;
   }
 
+  addEventListener(event: IEventType, cbk: IListener) {
+    const events = this.registerEvent(event);
+    events.push(cbk);
+
+    return () => {
+      this.removeListener(events, cbk);
+    };
+  }
+
+  removeEventListener(event: IEventType, listener?: IListener) {
+    if (this.events.has(event)) {
+      const events = this.events.get(event)!;
+      if (listener) {
+        this.removeListener(events, listener);
+      } else {
+        events.length = 0;
+        this.events.delete(event);
+      }
+    }
+  }
+
+  trigger(event: IEventType, e: ClickEvent) {
+    const handles = this.events.get(event);
+    const { cancelBubble } = e;
+    if (handles && !cancelBubble) {
+      handles.forEach((cbk) => {
+        cbk(e);
+      });
+      this.parent?.trigger(event, e);
+    }
+    return this;
+  }
+
+  registerEvent(event: IEventType) {
+    let events = this.events.get(event);
+    if (!events) {
+      events = [];
+      this.events.set(event, events);
+    }
+    return events;
+  }
+
+  removeListener(listeners: IListener[], listener: IListener) {
+    const idx = listeners.indexOf(listener);
+    idx > -1 && listeners.splice(idx, 1);
+    return this;
+  }
+
   protected onFrame(
     next: (d: CanvasRenderingContext2D) => void,
     error?: () => void
@@ -143,12 +194,16 @@ export class Base {
           if (!this._prevTime) {
             this._prevTime = value;
           }
-          return (value - this._prevTime).toFixed(2);
+          return {
+            elapsedTime: (value - this._prevTime).toFixed(2),
+            value,
+          };
         })
       )
       .subscribe({
-        next: (elapsedTime) => {
-          if (elapsedTime >= this._fps) {
+        next: ({ elapsedTime, value }) => {
+          if (elapsedTime >= this._fps && Base.context) {
+            this._prevTime = value;
             this._children?.forEach((child) => {
               child.beforeFrameUpdate?.();
             });
@@ -171,19 +226,5 @@ export class Base {
       this._children?.clear();
       this._mounted = false;
     };
-  }
-
-  static onCapture(child: IElement) {
-    return Event.capture
-      .pipe(
-        filter(({ value }) => {
-          return Base.isClicked(value, child);
-        })
-      )
-      .subscribe(({ value }) => {
-        if (Base.isClicked(value, child)) {
-          console.log(child);
-        }
-      });
   }
 }

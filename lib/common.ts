@@ -1,6 +1,10 @@
 import { Scene } from "./scene";
 import { Texture } from "./Texture";
 
+export interface IClickable {
+  clickable: boolean;
+}
+
 export interface IDestroy {
   destroy(): void;
 }
@@ -28,6 +32,7 @@ export type IFrame = {
 export class ClickEvent {
   x: number;
   y: number;
+  target: any;
 
   private _stop = false;
 
@@ -50,16 +55,6 @@ export type IClick = {
   value: ClickEvent;
 };
 
-export type ICapture = {
-  type: Events.Capture;
-  value: ClickEvent;
-};
-
-export type IBubbling = {
-  type: Events.Bubbling;
-  value: ClickEvent;
-};
-
 export type ISwitch = {
   type: Events.SWITCH_SCENE;
   value: Scene;
@@ -73,30 +68,11 @@ export type ILoading = {
   };
 };
 
-export type IEvent =
-  | IFrame
-  | IClick
-  | ICapture
-  | IBubbling
-  | ISwitch
-  | ILoading;
+export type IEvent = IFrame | IClick | ISwitch | ILoading;
 
 export enum STAGE_STATUS {
   LOADING, // 加载资源
   PAUSED, // 暂停
   PLAY, // 播放
   TRANSITION, // 转场
-}
-
-export interface IParent {
-  appendChild(child: IChild): any;
-  removeChild(child: IChild): any;
-}
-
-export type IParents = IParent | IParent[];
-
-export interface IChild {
-  draw(ctx: CanvasRenderingContext2D): void;
-  destroy(): void;
-  texture?: Texture;
 }

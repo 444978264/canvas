@@ -1,14 +1,11 @@
-import { filter, Subscription } from "rxjs";
 import { Base, IElement } from "./base";
-import { ClickEvent } from "./common";
-import { Event } from "./event";
+import { ClickEvent, IClickable } from "./common";
 import { Texture } from "./Texture";
 
 type IShape = {
   x?: number;
   y?: number;
   clickable?: boolean;
-  action?: (e: ClickEvent) => void;
 };
 
 // 显示形状
@@ -25,7 +22,6 @@ export class Shape extends Base implements IElement {
   }
 
   private _clickable = false;
-  private $sub?: Subscription;
 
   get clickable() {
     return this._clickable;
@@ -38,9 +34,7 @@ export class Shape extends Base implements IElement {
   constructor(public texture: Texture, options?: IShape) {
     super();
     if (options) {
-      const { action, ...props } = options;
-      Object.assign(this, props);
-      this.clickable && action && this.onClick(action);
+      Object.assign(this, options);
     }
   }
 
@@ -51,21 +45,10 @@ export class Shape extends Base implements IElement {
   }
 
   onClick(next: (e: ClickEvent) => void) {
-    this.$sub = Event.click
-      .pipe(
-        filter(({ value }) => {
-          return this._clickable && Base.isClicked(value, this);
-        })
-      )
-      .subscribe({
-        next: ({ value }) => {
-          next(value);
-        },
-      });
-    return this.$sub;
+    return this.addEventListener("click", (e) => this.clickable && next(e));
   }
 
   destroy() {
-    this.$sub?.unsubscribe();
+    this.removeEventListener("click");
   }
 }

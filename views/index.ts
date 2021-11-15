@@ -1,4 +1,5 @@
 import { assets } from "../assets";
+import { Base } from "../lib/base";
 import { Stage } from "../lib/stage";
 import { home } from "./home.scene";
 import { loading } from "./loading.scene";
@@ -13,7 +14,7 @@ const width = 288,
 instance.width = width;
 instance.height = height;
 instance.style.backgroundColor = "#fff";
-
+Base.canvas = instance;
 const game = new Stage(instance, assets);
 game.setLoading(loading);
 game.register(home);
