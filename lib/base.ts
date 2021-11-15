@@ -1,4 +1,5 @@
-import { map } from "rxjs";
+import { filter, map } from "rxjs";
+import { ClickEvent } from "./common";
 import { Event } from "./event";
 
 export interface IElement {
@@ -7,6 +8,7 @@ export interface IElement {
   width: number;
   height: number;
   draw(ctx: CanvasRenderingContext2D): void;
+  parent?: Base;
   beforeFrameUpdate?(): void;
   mounted?(): void;
   destroy?(): void;
@@ -26,8 +28,24 @@ export interface IRectOptions {
 }
 
 export class Base {
-  private _mounted = false;
-  protected context: CanvasRenderingContext2D = this.canvas.getContext("2d")!;
+  static $$canvas: HTMLCanvasElement;
+  static $$context: CanvasRenderingContext2D;
+
+  static get canvas() {
+    return Base.$$canvas;
+  }
+  static set canvas(el: HTMLCanvasElement) {
+    Base.$$canvas = el;
+  }
+
+  static get context() {
+    if (!Base.$$context) {
+      Base.$$context = Base.canvas?.getContext("2d")!;
+    }
+    return Base.$$context;
+  }
+
+  protected _mounted = false;
   private _children?: Set<IElement>;
   private _prevTime: number;
   private _fps: string;
@@ -39,24 +57,22 @@ export class Base {
     return this._children;
   }
 
-  get width() {
-    return this.canvas.width;
+  get clientWidth() {
+    return Base.canvas?.width ?? 0;
   }
 
-  get height() {
-    return this.canvas.height;
+  get clientHeight() {
+    return Base.canvas?.height ?? 0;
   }
 
-  constructor(protected canvas: HTMLCanvasElement, _fps: number = 60) {
+  constructor(_fps: number = 60) {
     this._fps = ((1 / _fps) * 1000).toFixed(2);
   }
 
-  static isClicked(e: MouseEvent, element: IElement) {
-    const { offsetX, offsetY } = e;
+  static isClicked(e: ClickEvent, element: IElement) {
+    const { x, y } = e;
     const { left, top, right, bottom } = Base.getBoundingClientRect(element);
-    return (
-      left <= offsetX && offsetX <= right && top <= offsetY && offsetY <= bottom
-    );
+    return left <= x && x <= right && top <= y && y <= bottom;
   }
 
   static getBoundingClientRect(
@@ -92,6 +108,7 @@ export class Base {
 
   appendChild(child: IElement) {
     this.children.add(child);
+    child.parent = this;
     if (this._mounted) {
       child.mounted?.();
     }
@@ -101,6 +118,7 @@ export class Base {
   removeChild(child: IElement) {
     if (this.children.has(child)) {
       this.children.delete(child);
+      child.parent = undefined;
       child.destroy?.();
     }
     return this;
@@ -134,12 +152,12 @@ export class Base {
             this._children?.forEach((child) => {
               child.beforeFrameUpdate?.();
             });
-            this.context.save();
-            next(this.context);
+            Base.context.save();
+            next(Base.context);
             this._children?.forEach((child) => {
-              child.draw(this.context);
+              child.draw(Base.context);
             });
-            this.context.restore();
+            Base.context.restore();
           }
         },
         error,
@@ -151,6 +169,21 @@ export class Base {
         child.destroy?.();
       });
       this._children?.clear();
+      this._mounted = false;
     };
+  }
+
+  static onCapture(child: IElement) {
+    return Event.capture
+      .pipe(
+        filter(({ value }) => {
+          return Base.isClicked(value, child);
+        })
+      )
+      .subscribe(({ value }) => {
+        if (Base.isClicked(value, child)) {
+          console.log(child);
+        }
+      });
   }
 }

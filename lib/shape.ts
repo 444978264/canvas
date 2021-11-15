@@ -1,5 +1,6 @@
 import { filter, Subscription } from "rxjs";
 import { Base, IElement } from "./base";
+import { ClickEvent } from "./common";
 import { Event } from "./event";
 import { Texture } from "./Texture";
 
@@ -7,10 +8,11 @@ type IShape = {
   x?: number;
   y?: number;
   clickable?: boolean;
+  action?: (e: ClickEvent) => void;
 };
 
 // 显示形状
-export class Shape implements IElement {
+export class Shape extends Base implements IElement {
   public x: number = 0;
   public y: number = 0;
 
@@ -34,7 +36,12 @@ export class Shape implements IElement {
   }
 
   constructor(public texture: Texture, options?: IShape) {
-    if (options) Object.assign(this, options);
+    super();
+    if (options) {
+      const { action, ...props } = options;
+      Object.assign(this, props);
+      this.clickable && action && this.onClick(action);
+    }
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -43,7 +50,7 @@ export class Shape implements IElement {
     }
   }
 
-  onClick(next: (e: MouseEvent) => void) {
+  onClick(next: (e: ClickEvent) => void) {
     this.$sub = Event.click
       .pipe(
         filter(({ value }) => {

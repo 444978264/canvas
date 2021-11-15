@@ -1,6 +1,7 @@
 import { IAssets } from "../assets";
+import { Base } from "./base";
 import { Events, IDestroy, STAGE_STATUS } from "./common";
-import { Event } from "./event";
+import { Event, mouseEvent } from "./event";
 import { Resource } from "./resource";
 import { Scene } from "./scene";
 
@@ -40,10 +41,18 @@ export class Stage implements IDestroy {
   // 画布初始化
   init() {
     const clickHandle = (e: MouseEvent) => {
+      const { offsetY, offsetX } = e;
+      mouseEvent.x = offsetX;
+      mouseEvent.y = offsetY;
+
       Event.next({
-        type: Events.CLICK,
-        value: e,
+        type: Events.Capture,
+        value: mouseEvent,
       });
+      // Event.next({
+      //   type: Events.CLICK,
+      //   value: mouseEvent,
+      // });
     };
 
     const frameRender = (s: number) => {

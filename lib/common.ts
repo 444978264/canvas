@@ -16,6 +16,8 @@ export enum Events {
   SWITCH_SCENE,
   FIRST_FRAME,
   LOADING,
+  Capture,
+  Bubbling,
 }
 
 export type IFrame = {
@@ -23,9 +25,39 @@ export type IFrame = {
   value: number;
 };
 
+export class ClickEvent {
+  x: number;
+  y: number;
+
+  private _stop = false;
+
+  get cancelBubble() {
+    return this._stop;
+  }
+
+  constructor() {}
+
+  stopPropagation() {
+    this._stop = true;
+    setTimeout(() => {
+      this._stop = false;
+    }, 0);
+  }
+}
+
 export type IClick = {
   type: Events.CLICK;
-  value: MouseEvent;
+  value: ClickEvent;
+};
+
+export type ICapture = {
+  type: Events.Capture;
+  value: ClickEvent;
+};
+
+export type IBubbling = {
+  type: Events.Bubbling;
+  value: ClickEvent;
 };
 
 export type ISwitch = {
@@ -41,7 +73,13 @@ export type ILoading = {
   };
 };
 
-export type IEvent = IFrame | IClick | ISwitch | ILoading;
+export type IEvent =
+  | IFrame
+  | IClick
+  | ICapture
+  | IBubbling
+  | ISwitch
+  | ILoading;
 
 export enum STAGE_STATUS {
   LOADING, // 加载资源
