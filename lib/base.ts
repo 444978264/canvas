@@ -128,7 +128,18 @@ export class Base {
   }
 
   contains(child: IElement) {
-    return this._children ? this._children.has(child) : false;
+    let parent = child.parent;
+    let isChild = false;
+
+    while (parent) {
+      if (parent === this) {
+        isChild = true;
+        break;
+      }
+      parent = parent.parent;
+    }
+
+    return isChild;
   }
 
   addEventListener(event: IEventType, cbk: IListener) {
