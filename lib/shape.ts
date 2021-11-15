@@ -1,5 +1,5 @@
-import { Subscription, takeWhile } from "rxjs";
-import { IChild, IDestroy } from "./common";
+import { filter, Subscription } from "rxjs";
+import { Base, IElement } from "./base";
 import { Event } from "./event";
 import { Texture } from "./Texture";
 
@@ -10,9 +10,18 @@ type IShape = {
 };
 
 // 显示形状
-export class Shape implements IChild, IDestroy {
+export class Shape implements IElement {
   public x: number = 0;
   public y: number = 0;
+
+  get width() {
+    return this.texture.loaded ? this.texture.width : 0;
+  }
+
+  get height() {
+    return this.texture.loaded ? this.texture.height : 0;
+  }
+
   private _clickable = false;
   private $sub?: Subscription;
 
@@ -37,14 +46,12 @@ export class Shape implements IChild, IDestroy {
   onClick(next: (e: MouseEvent) => void) {
     this.$sub = Event.click
       .pipe(
-        takeWhile(() => {
-          return this._clickable;
+        filter(({ value }) => {
+          return this._clickable && Base.isClicked(value, this);
         })
       )
       .subscribe({
         next: ({ value }) => {
-          console.log(this.x, this.y);
-          // todo 点击区域校验
           next(value);
         },
       });

@@ -25,7 +25,7 @@ export interface IRectOptions {
   offsetY: number;
 }
 
-class Base {
+export class Base {
   private _mounted = false;
   protected context: CanvasRenderingContext2D = this.canvas.getContext("2d")!;
   private _children?: Set<IElement>;
