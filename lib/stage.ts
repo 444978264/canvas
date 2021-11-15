@@ -32,43 +32,26 @@ export class Stage implements IDestroy {
       });
     });
   }
-  
+
   // 捕获
   capture(e: ClickEvent, children: IElement[]): Base {
-    const result: { element: IElement; zIndex: number }[] = [];
-    let max: { element: IElement; zIndex: number } | null = null;
+    let activated: IElement | null = null;
     let data = children;
 
     while (data.length) {
       const element = data.shift()!;
       if (Base.isClicked(e, element)) {
-        const idx = result.length - 1;
-        let last: any;
-        if (idx >= 0 && result[idx].element === element.parent) {
-          last = result[idx];
-          last.element = element;
-          last.zIndex++;
-        } else {
-          last = {
-            element,
-            zIndex: 0,
-          };
-          result.push(last);
+        if (!activated || activated.zIndex <= element.zIndex) {
+          activated = element;
         }
-
-        if ((max && max.zIndex <= last.zIndex) || !max) {
-          max = last;
-        }
-
         if (element.children.size) {
           data = [...element.children];
         }
       }
     }
 
-    return max!.element;
+    return activated!;
   }
-
   // 画布初始化
   init() {
     const clickHandle = (e: MouseEvent) => {

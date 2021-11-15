@@ -20,18 +20,28 @@ export const home = new (class extends Scene {
     const landCopy = new Shape(landTexture);
     this.appendChild(landCopy);
     const btn = new Shape(playBtn, { clickable: true });
+    const btn2 = new Shape(playBtn, { clickable: true });
+    console.log(btn, "btn");
 
     btn.onClick((e) => {
       this.removeChild(btn);
-      console.log("btn1", this, e);
+      console.log("btn1", btn.zIndex, this, e);
+    });
+
+    btn2.onClick((e) => {
+      this.removeChild(btn2);
+      console.log("btn2", btn2.zIndex, this, e);
     });
 
     this.appendChild(btn);
+    this.appendChild(btn2);
 
     landCopy.x = -this.clientWidth;
     landCopy.y = land.y = this.clientHeight - land.texture.height;
     btn.x = (this.clientWidth - btn.texture.width) / 2;
     btn.y = (this.clientHeight - btn.texture.height) / 2;
+    btn2.x = this.clientWidth / 2;
+    btn2.y = this.clientHeight / 2;
 
     this._destroy = this.onFrame((ctx) => {
       land.x += 2;

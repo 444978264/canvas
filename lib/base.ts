@@ -47,6 +47,7 @@ export class Base {
     return Base.$$context;
   }
   parent?: Base;
+  zIndex = 0;
   protected _mounted = false;
   private _children?: Set<IElement>;
   private _prevTime: number;
@@ -112,6 +113,9 @@ export class Base {
   appendChild(child: IElement) {
     this.children.add(child);
     child.parent = this;
+    if (child.zIndex === 0) {
+      child.zIndex = this.zIndex + 1;
+    }
     if (this._mounted) {
       child.mounted?.();
     }
@@ -122,6 +126,7 @@ export class Base {
     if (this.children.has(child)) {
       this.children.delete(child);
       child.parent = undefined;
+      child.zIndex = 0;
       child.destroy?.();
     }
     return this;
@@ -197,6 +202,7 @@ export class Base {
     this._children?.forEach((child) => {
       child.mounted?.();
     });
+
     this._mounted = true;
 
     const sub = Event.frame
