@@ -22,7 +22,8 @@ export const home = new (class extends Scene {
     const btn = new Shape(playBtn, { clickable: true });
 
     btn.onClick((e) => {
-      console.log("btn1", e);
+      this.removeChild(btn);
+      console.log("btn1", this, e);
     });
 
     this.appendChild(btn);

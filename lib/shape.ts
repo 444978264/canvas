@@ -36,6 +36,7 @@ export class Shape extends Base implements IElement {
     if (options) {
       Object.assign(this, options);
     }
+    console.log(this, "shape");
   }
 
   draw(ctx: CanvasRenderingContext2D) {
