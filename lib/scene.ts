@@ -1,5 +1,5 @@
 import { filter } from "rxjs";
-import { IChild, ILifeCycle, IParent } from "./base";
+import { IChild, ILifeCycle, IParent } from "./common";
 import { Event } from "./event";
 import { Stage } from "./stage";
 

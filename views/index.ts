@@ -4,6 +4,7 @@ import { home } from "./home.scene";
 import { loading } from "./loading.scene";
 
 document.documentElement.style.backgroundColor = "#000";
+document.body.style.margin = "0";
 
 const instance = (document.getElementById("canvas") as HTMLCanvasElement)!;
 const width = 288,
