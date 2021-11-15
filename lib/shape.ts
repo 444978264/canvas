@@ -1,5 +1,5 @@
 import { Subscription, takeWhile } from "rxjs";
-import { IChild, IDestroy } from "./base";
+import { IChild, IDestroy } from "./common";
 import { Event } from "./event";
 import { Texture } from "./Texture";
 

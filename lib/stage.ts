@@ -1,5 +1,5 @@
 import { IAssets } from "../assets";
-import { Events, IDestroy, STAGE_STATUS } from "./base";
+import { Events, IDestroy, STAGE_STATUS } from "./common";
 import { Event } from "./event";
 import { Resource } from "./resource";
 import { Scene } from "./scene";

@@ -1,5 +1,5 @@
-import { filter, share, shareReplay, Subject, Subscription } from "rxjs";
-import { Events, IClick, IEvent, IFrame, ILoading, ISwitch } from "./base";
+import { filter, share, shareReplay, Subject } from "rxjs";
+import { Events, IClick, IEvent, IFrame, ILoading, ISwitch } from "./common";
 
 export const Event = new (class extends Subject<IEvent> {
   // 动画帧
