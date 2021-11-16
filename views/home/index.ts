@@ -29,7 +29,7 @@ export const home = new (class extends Scene {
       this.appendChild(bird);
     });
 
-    landCopy.x = -this.clientWidth;
+    landCopy.x = this.clientWidth;
     landCopy.y = land.y = this.clientHeight - land.texture.height;
     btn.x = (this.clientWidth - btn.texture.width) / 2;
     btn.y = (this.clientHeight - btn.texture.height) / 2;
@@ -41,12 +41,12 @@ export const home = new (class extends Scene {
 
     this._destroy = this.onFrame((ctx) => {
       if (this.start) {
-        land.x += 2;
-        landCopy.x += 2;
+        land.x -= 2;
+        landCopy.x -= 2;
 
-        if (land.x > this.clientWidth) {
+        if (Math.abs(land.x) > this.clientWidth) {
           land.x = 0;
-          landCopy.x = -this.clientWidth;
+          landCopy.x = this.clientWidth;
         }
       }
     });
