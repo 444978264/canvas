@@ -1,6 +1,7 @@
 import { map } from "rxjs";
 import { ClickEvent } from "./common";
 import { Event } from "./event";
+import { LinkedList } from "./linkedList";
 
 export interface IElement extends Base {
   x: number;
@@ -29,7 +30,7 @@ export interface IRectOptions {
 export type IEventType = "click";
 type IListener = (e: ClickEvent) => void;
 
-export class Base {
+export abstract class Base {
   static $$canvas: HTMLCanvasElement;
   static $$context: CanvasRenderingContext2D;
 
@@ -47,16 +48,19 @@ export class Base {
     return Base.$$context;
   }
   parent?: Base;
+  next?: IElement;
+  prev?: IElement;
   zIndex = 0;
+
   protected _mounted = false;
-  private _children?: Set<IElement>;
+  private _children?: LinkedList<IElement>;
   private _prevTime: number;
   private _fps: string;
   protected events = new Map<IEventType, IListener[]>();
 
   get children() {
     if (!this._children) {
-      this._children = new Set();
+      this._children = new LinkedList();
     }
     return this._children;
   }
@@ -111,11 +115,11 @@ export class Base {
   }
 
   appendChild(child: IElement) {
-    this.children.add(child);
-    child.parent = this;
     if (child.zIndex === 0) {
       child.zIndex = this.zIndex + 1;
     }
+    this.children.append(child);
+    child.parent = this;
     if (this._mounted) {
       child.mounted?.();
     }
@@ -123,10 +127,8 @@ export class Base {
   }
 
   removeChild(child: IElement) {
-    if (this.children.has(child)) {
-      this.children.delete(child);
+    if (this.children.remove(child)) {
       child.parent = undefined;
-      child.zIndex = 0;
       child.destroy?.();
     }
     return this;
@@ -199,7 +201,7 @@ export class Base {
     next: (d: CanvasRenderingContext2D) => void,
     error?: () => void
   ) {
-    this._children?.forEach((child) => {
+    this._children?.forEach((child: IElement) => {
       child.mounted?.();
     });
 
@@ -221,13 +223,13 @@ export class Base {
         next: ({ elapsedTime, value }) => {
           if (elapsedTime >= this._fps && Base.context) {
             this._prevTime = value;
-            this._children?.forEach((child) => {
+            this._children?.forEach((child: IElement) => {
               child.beforeFrameUpdate?.();
             });
             Base.context.save();
             next(Base.context);
-            this._children?.forEach((child) => {
-              child.draw(Base.context);
+            this._children?.forEach((child: IElement) => {
+              child.draw?.(Base.context);
             });
             Base.context.restore();
           }
@@ -236,11 +238,11 @@ export class Base {
       });
 
     return () => {
-      sub.unsubscribe();
-      this._children?.forEach((child) => {
+      this._children?.removeAll((child: IElement) => {
+        child.parent = undefined;
         child.destroy?.();
       });
-      this._children?.clear();
+      sub.unsubscribe();
       this._mounted = false;
     };
   }

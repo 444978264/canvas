@@ -10,6 +10,7 @@ export abstract class Scene extends Base {
 
   constructor(public readonly name: string) {
     super();
+    console.log(this, "scene");
   }
 
   setStage(ctx: Stage) {
