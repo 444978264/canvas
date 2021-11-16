@@ -1,7 +1,7 @@
 import { Base } from "../../lib/base";
 import { Scene } from "../../lib/scene";
 import { Shape } from "../../lib/shape";
-import { Sprite } from "../../lib/sprite";
+import {Bird} from "./bird";
 
 export const home = new (class extends Scene {
   private _destroy?: () => void;
@@ -19,13 +19,15 @@ export const home = new (class extends Scene {
     const landCopy = new Shape({ texture: landTexture });
     const btn = new Shape({ clickable: true, texture: playBtn });
 
-    const bird = new Sprite();
+    const bird = new Bird();
     bird.x = (this.clientWidth - bird.width) / 2;
     bird.y = (this.clientHeight - bird.height) / 2;
 
     btn.onClick((e) => {
       this.start = true;
       this.removeChild(btn);
+      this.removeChild(land);
+      this.removeChild(landCopy);
       this.appendChild(bird);
     });
 

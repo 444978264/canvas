@@ -1,7 +1,7 @@
-import { Base, IElement } from "./base";
-import { Texture } from "./Texture";
+import { Base, IElement } from "../../lib/base";
+import { Texture } from "../../lib/Texture";
 
-export class Sprite extends Base implements IElement {
+export class Bird extends Base implements IElement {
   private _destroy?: () => void;
   x: number;
   y: number;
