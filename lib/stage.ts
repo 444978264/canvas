@@ -44,7 +44,7 @@ export class Stage implements IDestroy {
         if (!activated || activated.zIndex <= element.zIndex) {
           activated = element;
         }
-        if (element.children.size) {
+        if (element.children.size()) {
           data = [...element.children];
         }
       }
@@ -59,7 +59,7 @@ export class Stage implements IDestroy {
       mouseEvent.x = offsetX;
       mouseEvent.y = offsetY;
 
-      if (this.currentScene && this.currentScene.children.size) {
+      if (this.currentScene && this.currentScene.children.size()) {
         const element = this.capture(mouseEvent, [
           ...this.currentScene.children,
         ]);
