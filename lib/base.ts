@@ -1,14 +1,16 @@
 import { map } from "rxjs";
+import { IAssets } from "../assets";
 import { ClickEvent } from "./common";
 import { Event } from "./event";
 import { LinkedList } from "./linkedList";
+import { Resource } from "./resource";
 
 export interface IElement extends Base {
   x: number;
   y: number;
   width: number;
   height: number;
-  draw(ctx: CanvasRenderingContext2D): void;
+  draw?(ctx: CanvasRenderingContext2D): void;
   beforeFrameUpdate?(): void;
   mounted?(): void;
   destroy?(): void;
@@ -31,6 +33,7 @@ export type IEventType = "click";
 type IListener = (e: ClickEvent) => void;
 
 export abstract class Base {
+  static resource: Resource<IAssets>;
   static $$canvas: HTMLCanvasElement;
   static $$context: CanvasRenderingContext2D;
 
@@ -54,8 +57,8 @@ export abstract class Base {
 
   protected _mounted = false;
   private _children?: LinkedList<IElement>;
-  private _prevTime: number;
-  private _fps: string;
+  protected _prevTime: number;
+  protected _fps: number;
   protected events = new Map<IEventType, IListener[]>();
 
   get children() {
@@ -73,8 +76,8 @@ export abstract class Base {
     return Base.canvas?.height ?? 0;
   }
 
-  constructor(_fps: number = 60) {
-    this._fps = ((1 / _fps) * 1000).toFixed(2);
+  constructor(_fps: number = (1 / 60) * 1000) {
+    this._fps = +_fps.toFixed(2);
   }
 
   static isClicked(e: ClickEvent, element: IElement) {
@@ -197,6 +200,13 @@ export abstract class Base {
     return this;
   }
 
+  removeAllListener() {
+    this.events.forEach((handles) => {
+      handles.length = 0;
+    });
+    this.events.clear();
+  }
+
   protected onFrame(
     next: (d: CanvasRenderingContext2D) => void,
     error?: () => void
@@ -214,7 +224,7 @@ export abstract class Base {
             this._prevTime = value;
           }
           return {
-            elapsedTime: (value - this._prevTime).toFixed(2),
+            elapsedTime: +(value - this._prevTime).toFixed(2),
             value,
           };
         })

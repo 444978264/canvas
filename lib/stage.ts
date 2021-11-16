@@ -1,8 +1,6 @@
-import { IAssets } from "../assets";
 import { Base, IElement } from "./base";
 import { ClickEvent, Events, IDestroy, STAGE_STATUS } from "./common";
 import { Event, mouseEvent } from "./event";
-import { Resource } from "./resource";
 import { Scene } from "./scene";
 
 export class Stage implements IDestroy {
@@ -11,7 +9,6 @@ export class Stage implements IDestroy {
   public context: CanvasRenderingContext2D;
   public currentScene: Scene | null;
   public status: STAGE_STATUS = STAGE_STATUS.LOADING;
-  public resource: Resource<IAssets>;
 
   get width() {
     return this._canvas.width;
@@ -21,16 +18,9 @@ export class Stage implements IDestroy {
     return this._canvas.height;
   }
 
-  constructor(private _canvas: HTMLCanvasElement, assets: IAssets) {
+  constructor(private _canvas: HTMLCanvasElement) {
     this.context = this._canvas.getContext("2d")!;
     this._destroy = this.init();
-    this.resource = new Resource(assets);
-    this.resource.subscribe((res) => {
-      Event.next({
-        type: Events.LOADING,
-        value: res,
-      });
-    });
   }
 
   // 捕获

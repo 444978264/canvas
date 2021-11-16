@@ -1,4 +1,5 @@
-import { Subject } from "rxjs";
+import { Events } from "./common";
+import { Event } from "./event";
 import { Texture } from "./Texture";
 
 interface ISchedule {
@@ -6,9 +7,7 @@ interface ISchedule {
   schedule: number;
 }
 
-export class Resource<
-  T extends Record<string, string>
-> extends Subject<ISchedule> {
+export class Resource<T extends Record<string, string>> {
   _count = 0;
   _sourceMap = new Map<keyof T, Texture>();
   _pendingSource = new Set<Promise<boolean>>();
@@ -18,7 +17,6 @@ export class Resource<
   }
 
   constructor(assets: T) {
-    super();
     for (const [name, src] of Object.entries(assets)) {
       this.add(new Texture(name, src));
     }
@@ -36,12 +34,13 @@ export class Resource<
     const promise = texture.load().then((d) => {
       this._pendingSource.delete(promise);
       this._sourceMap.set(texture.name, texture);
-
-      this.next({
-        total: this.count,
-        schedule: ++this._count,
+      Event.next({
+        type: Events.LOADING,
+        value: {
+          total: this.count,
+          schedule: ++this._count,
+        },
       });
-
       return d;
     });
 

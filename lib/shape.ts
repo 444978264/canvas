@@ -1,8 +1,9 @@
-import { Base, IElement } from "./base";
-import { ClickEvent, IClickable } from "./common";
-import { Texture } from "./Texture";
+import {Base, IElement} from "./base";
+import {ClickEvent} from "./common";
+import {Texture} from "./Texture";
 
 type IShape = {
+  texture?: Texture;
   x?: number;
   y?: number;
   clickable?: boolean;
@@ -12,6 +13,7 @@ type IShape = {
 export class Shape extends Base implements IElement {
   public x: number = 0;
   public y: number = 0;
+  public texture: Texture;
 
   get width() {
     return this.texture.loaded ? this.texture.width : 0;
@@ -31,7 +33,7 @@ export class Shape extends Base implements IElement {
     this._clickable = val;
   }
 
-  constructor(public texture: Texture, options?: IShape) {
+  constructor(options?: IShape) {
     super();
     if (options) {
       Object.assign(this, options);
@@ -39,7 +41,7 @@ export class Shape extends Base implements IElement {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    if (this.texture.loaded) {
+    if (this.texture?.loaded) {
       ctx.drawImage(this.texture.bitmap, this.x, this.y);
     }
   }
@@ -49,6 +51,6 @@ export class Shape extends Base implements IElement {
   }
 
   destroy() {
-    this.removeEventListener("click");
+    this.removeAllListener();
   }
 }
