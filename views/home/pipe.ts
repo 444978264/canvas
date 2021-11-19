@@ -2,15 +2,19 @@ import { Base, IElement } from "../../lib/base";
 import { Texture } from "../../lib/Texture";
 
 export class Pipes extends Base implements IElement {
+  static space = 1 / 4;
   private _destroy?: () => void;
   x: number;
   y: number;
+
   get width() {
     return this.bitmaps[this.idx].width;
   }
+
   get height() {
     return this.bitmaps[this.idx].height;
   }
+
   idx: number = 1;
   bitmaps: Texture[] = [
     Base.resource.getTexture("pipeDown"),
@@ -18,14 +22,17 @@ export class Pipes extends Base implements IElement {
   ];
 
   constructor() {
-    super(100);
+    super();
     console.log(this, "this");
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    const texture = this.bitmaps[this.idx];
-    if (texture?.loaded) {
-      ctx.drawImage(texture.bitmap, this.x, this.y);
+    const [down, up] = this.bitmaps;
+    if (down?.loaded) {
+      ctx.drawImage(down.bitmap, this.x, this.y);
+    }
+    if (up?.loaded) {
+      ctx.drawImage(down.bitmap, this.x, this.y);
     }
   }
 
