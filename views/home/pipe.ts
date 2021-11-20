@@ -1,19 +1,10 @@
 import { Base, IElement } from "../../lib/base";
+import { BaseElement } from "../../lib/element";
 import { Texture } from "../../lib/Texture";
 
-export class Pipes extends Base implements IElement {
+export class Pipes extends BaseElement {
   static space = 1 / 4;
   private _destroy?: () => void;
-  x: number;
-  y: number;
-
-  get width() {
-    return this.bitmaps[this.idx].width;
-  }
-
-  get height() {
-    return this.bitmaps[this.idx].height;
-  }
 
   idx: number = 1;
   bitmaps: Texture[] = [

@@ -1,17 +1,11 @@
 import { filter, share, shareReplay, Subject } from "rxjs";
-import {
-  ClickEvent,
-  Events,
-  IClick,
-  IEvent,
-  IFrame,
-  ILoading,
-  ISwitch,
-} from "./common";
+import { IClick, IFrame, ILoading, ISubjectEvent, ISwitch } from "./common";
+import { Events } from "./enums";
+import { IEvent } from "./types";
 
-export const mouseEvent = new ClickEvent();
+export const mouseEvent = new (class extends IEvent {})();
 
-export const Event = new (class extends Subject<IEvent> {
+export const Event = new (class extends Subject<ISubjectEvent> {
   // 动画帧
   frame = this.on<IFrame>(Events.FRAME);
   // 点击事件
@@ -23,7 +17,7 @@ export const Event = new (class extends Subject<IEvent> {
   // 资源加载
   loading = this.on<ILoading>(Events.LOADING, true);
 
-  on<T extends IEvent>(event: T["type"], replay = false) {
+  on<T extends ISubjectEvent>(event: T["type"], replay = false) {
     return this.pipe(
       filter<T>((res) => res.type === event),
       replay

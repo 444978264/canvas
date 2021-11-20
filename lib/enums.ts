@@ -4,3 +4,13 @@ export enum STAGE_STATUS {
   PLAY, // 播放
   TRANSITION, // 转场
 }
+
+export enum Events {
+  FRAME,
+  CLICK,
+  SWITCH_SCENE,
+  FIRST_FRAME,
+  LOADING,
+  Capture,
+  Bubbling,
+}

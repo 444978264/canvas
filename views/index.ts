@@ -1,5 +1,5 @@
 import { assets } from "../assets";
-import { Base } from "../lib/base";
+import { BaseElement } from "../lib/element";
 import { Resource } from "../lib/resource";
 import { Stage } from "../lib/stage";
 import { home } from "./home";
@@ -15,8 +15,8 @@ const width = 288,
 instance.width = width;
 instance.height = height;
 instance.style.backgroundColor = "#fff";
-Base.canvas = instance;
-Base.resource = new Resource(assets);
+BaseElement.canvas = instance;
+BaseElement.resource = new Resource(assets);
 const game = new Stage(instance);
 game.setLoading(loading);
 game.register(home);

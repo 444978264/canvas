@@ -1,7 +1,7 @@
-import { Base } from "./base";
+import { BaseElement } from "./element";
 import { Stage } from "./stage";
 
-export abstract class Scene extends Base {
+export abstract class Scene extends BaseElement {
   private _stage: Stage | null;
 
   get stage() {

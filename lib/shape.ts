@@ -1,6 +1,6 @@
-import {Base, IElement} from "./base";
-import {ClickEvent} from "./common";
-import {Texture} from "./Texture";
+import { BaseElement } from "./element";
+import { Texture } from "./Texture";
+import { IEvent } from "./types";
 
 type IShape = {
   texture?: Texture;
@@ -10,19 +10,10 @@ type IShape = {
 };
 
 // 显示形状
-export class Shape extends Base implements IElement {
+export class Shape extends BaseElement {
   public x: number = 0;
   public y: number = 0;
   public texture: Texture;
-
-  get width() {
-    return this.texture.loaded ? this.texture.width : 0;
-  }
-
-  get height() {
-    return this.texture.loaded ? this.texture.height : 0;
-  }
-
   private _clickable = false;
 
   get clickable() {
@@ -38,6 +29,10 @@ export class Shape extends Base implements IElement {
     if (options) {
       Object.assign(this, options);
     }
+    this.texture?.load().then(() => {
+      this.width = this.texture.width;
+      this.height = this.texture.height;
+    });
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -46,7 +41,7 @@ export class Shape extends Base implements IElement {
     }
   }
 
-  onClick(next: (e: ClickEvent) => void) {
+  onClick(next: (e: IEvent) => void) {
     return this.addEventListener("click", (e) => this.clickable && next(e));
   }
 

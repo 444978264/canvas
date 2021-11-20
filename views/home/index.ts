@@ -1,7 +1,7 @@
-import { Base } from "../../lib/base";
+import { BaseElement } from "../../lib/element";
 import { Scene } from "../../lib/scene";
 import { Shape } from "../../lib/shape";
-import {Bird} from "./bird";
+import { Bird } from "./bird";
 
 export const home = new (class extends Scene {
   private _destroy?: () => void;
@@ -11,17 +11,14 @@ export const home = new (class extends Scene {
   }
 
   mounted() {
-    const dayTexture = Base.resource.getTexture("day");
-    const landTexture = Base.resource.getTexture("land");
-    const playBtn = Base.resource.getTexture("button_play");
+    const dayTexture = BaseElement.resource.getTexture("day");
+    const landTexture = BaseElement.resource.getTexture("land");
+    const playBtn = BaseElement.resource.getTexture("button_play");
     const background = new Shape({ texture: dayTexture });
     const land = new Shape({ texture: landTexture });
     const landCopy = new Shape({ texture: landTexture });
     const btn = new Shape({ clickable: true, texture: playBtn });
-
     const bird = new Bird();
-    bird.x = (this.clientWidth - bird.width) / 2;
-    bird.y = (this.clientHeight - bird.height) / 2;
 
     btn.onClick((e) => {
       this.start = true;

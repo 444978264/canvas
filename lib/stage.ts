@@ -1,7 +1,8 @@
-import { Base, IElement } from "./base";
-import { ClickEvent, Events, IDestroy, STAGE_STATUS } from "./common";
+import { BaseElement, IBaseElement } from "./element";
+import { Events, STAGE_STATUS } from "./enums";
 import { Event, mouseEvent } from "./event";
 import { Scene } from "./scene";
+import { IDestroy, IElement, IEvent } from "./types";
 
 export class Stage implements IDestroy {
   private _destroy: () => void;
@@ -24,17 +25,20 @@ export class Stage implements IDestroy {
   }
 
   // 捕获
-  capture(e: ClickEvent, children: IElement[]): Base {
-    let activated: IElement | null = null;
+  capture(
+    e: IEvent,
+    children: (BaseElement | IBaseElement)[]
+  ): BaseElement | IBaseElement {
+    let activated: BaseElement | IBaseElement | null = null;
     let data = children;
 
     while (data.length) {
       const element = data.shift()!;
-      if (Base.isClicked(e, element)) {
+      if (IElement.isClick(e, element)) {
         if (!activated || activated.zIndex <= element.zIndex) {
           activated = element;
         }
-        if (element.children.size()) {
+        if (element instanceof BaseElement && element.children?.size()) {
           data = [...element.children];
         }
       }

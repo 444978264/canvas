@@ -1,4 +1,4 @@
-import { Events } from "./common";
+import { Events } from "./enums";
 import { Event } from "./event";
 import { Texture } from "./Texture";
 

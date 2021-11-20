@@ -37,7 +37,7 @@ export class BaseElement extends IElement {
   zIndex = 0;
 
   protected _mounted = false;
-  private _children?: LinkedList<IElement>;
+  private _children?: LinkedList<IBaseElement>;
   protected _prevTime: number;
   protected _fps: number;
 

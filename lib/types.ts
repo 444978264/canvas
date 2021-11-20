@@ -70,6 +70,8 @@ export abstract class IElement implements IRectPoint {
   abstract width: number;
   abstract height: number;
   abstract parent?: IElement;
+  abstract prev?: IElement;
+  abstract next?: IElement;
 
   abstract zIndex: number;
   protected events = new Map<IEventType, IListener[]>();

@@ -1,26 +1,28 @@
-import { Base, IElement } from "../../lib/base";
+import { BaseElement } from "../../lib/element";
 import { Texture } from "../../lib/Texture";
+import { ILifeCycle } from "../../lib/types";
 
-export class Bird extends Base implements IElement {
+export class Bird extends BaseElement implements ILifeCycle {
   private _destroy?: () => void;
-  x: number;
-  y: number;
-  get width() {
-    return this.bitmaps[this.idx].width;
-  }
-  get height() {
-    return this.bitmaps[this.idx].height;
-  }
   idx: number = 1;
+
   bitmaps: Texture[] = [
-    Base.resource.getTexture("bird0"),
-    Base.resource.getTexture("bird1"),
-    Base.resource.getTexture("bird2"),
+    BaseElement.resource.getTexture("bird0"),
+    BaseElement.resource.getTexture("bird1"),
+    BaseElement.resource.getTexture("bird2"),
   ];
 
   constructor() {
     super(100);
     console.log(this, "this");
+  }
+
+  beforeFrameUpdate() {
+    const img = this.bitmaps[this.idx];
+    this.width = img.width;
+    this.height = img.height;
+    this.x = (this.clientWidth - this.width) / 2;
+    this.y = (this.clientHeight - this.height) / 2;
   }
 
   draw(ctx: CanvasRenderingContext2D) {
